@@ -4,11 +4,23 @@
 #include "sway/tree/view.h"
 #include "log.h"
 
-static bool parse_opacity(const char *opacity, float *val) {
+static bool parse_opacity(const char *opacity, float *current_opacity) {
 	char *err;
-	*val = strtof(opacity, &err);
-	if (*val < 0 || *val > 1 || *err) {
+	float val = strtof(opacity, &err);
+	if (val < -1 || val > 1 || *err) {
 		return false;
+	}
+
+	if (opacity[0] != '-' && opacity[0] != '+') {
+		*current_opacity = val;
+		return true;
+	}
+
+	*current_opacity += val;
+	if (*current_opacity < 0) {
+		*current_opacity = 0;
+	} else if (*current_opacity > 1) {
+		*current_opacity = 1;
 	}
 	return true;
 }
@@ -25,11 +37,11 @@ struct cmd_results *cmd_opacity(int argc, char **argv) {
 		return cmd_results_new(CMD_FAILURE, "No current container");
 	}
 
-	float opacity = 0.0f;
+	float opacity = con->alpha;
 
 	if (!parse_opacity(argv[0], &opacity)) {
 		return cmd_results_new(CMD_INVALID,
-				"Invalid value (expected 0..1): %s", argv[0]);
+				"Invalid value (expected -1..1): %s", argv[0]);
 	}
 
 	con->alpha = opacity;

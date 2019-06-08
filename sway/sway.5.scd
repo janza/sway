@@ -647,7 +647,8 @@ The default colors are:
 
 *opacity* <value>
 	Set the opacity of the window between 0 (completely transparent) and 1
-	(completely opaque).
+	(completely opaque). When the value is prefixed with a sign (ie +/-) it is
+	either added or subtracted from the current opacity.
 
 *tiling_drag*  enable|disable|toggle
 	Sets whether or not tiling containers can be dragged with the mouse. If
